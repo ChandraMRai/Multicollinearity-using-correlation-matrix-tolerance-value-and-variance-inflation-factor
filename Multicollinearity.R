@@ -8,8 +8,11 @@ library(manipulate)
 library(olsrr)
 
 # 1. Detecting multicollinearity using correlation matrix
-cor(regression, method = "pearson")
+cor(regression, method = "pearson") #Check if there is a significant correlation between independent variables
+eigen(cor(regression))$values #if eigen value varies largely among dependent variables, it indicates multicollinearity
 
+max(eigen(cor(regression)))$values/min(eigen(cor(regression)))$values # if the value is higher than 100, there's multicollinearity
+kappa(cor(regression), exact = TRUE)
 
 # 2&3. Detecting multicollinearity using Tolerance value and variance inflation factor
 # Full model
@@ -19,6 +22,9 @@ Binary <- glm(regression$LSTBinary~ regression$RVI +regression$IPVI+ regression$
               +regression$NDMI,
               data = regression, family = "binomial")
 summary(Binary)
+library(car)
+# VIf
+vif(Binary) # variance inflation factor of each independent variable is given: vif value less than 0.1 has multicollinearity
 
 ols_regress(regression$LSTBinary~ regression$RVI+regression$IPVI+ regression$DVI+
                        regression$NDVI + regression$NDWI+regression$NDMI,
